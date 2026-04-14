@@ -1,13 +1,14 @@
 const CACHE_NAME = 'zengarden-cache-v2';
 const urlsToCache = [
     '/',
-    '/index.html',
-    '/script.js',
-    '/style.css',
-    '/manifest.json'
+    '/care',
+    '/care/index.html',
+    '/care/script.js',
+    '/care/style.css',
+    '/care/manifest.json'
     // Add icons if you have them:
-    '/icon-192.png',
-    '/icon-512.png'
+    '/care/icon-192.png',
+    '/care/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
