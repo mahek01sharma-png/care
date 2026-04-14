@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ZenGarden Self-Care</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="light-mode">
-
+    <!-- Login Screen -->
     <div id="login-screen" class="container">
         <h1>🌱 ZenGarden</h1>
         
@@ -24,13 +24,14 @@
             <h3>Create Account</h3>
             <input type="text" id="reg-username" placeholder="Choose Username">
             <input type="password" id="reg-password" placeholder="Choose Password">
-            <button onclick="handleRegister()" style="background-color: var(--accent-pink);">Sign Up</button>
+            <button onclick="handleRegister()">Sign Up</button>
             <p>Already a gardener? <a href="#" onclick="toggleAuth(false)">Login</a></p>
         </div>
         
-        <p id="auth-error" style="color: red; margin-top: 10px;"></p>
+        <p id="auth-error"></p>
     </div>
 
+    <!-- Main App Screen -->
     <div id="app-screen" class="container" style="display: none;">
         <div class="header-actions">
             <button id="theme-toggle" onclick="toggleTheme()">🌙 Sunset Mode</button>
@@ -41,13 +42,14 @@
             <p>Your Garden Growth:</p>
             <div id="plant-box"></div>
         </div>
-        
+
         <nav>
             <button onclick="showSection('mood')">🌸 Mood</button>
             <button onclick="showSection('journal')">📖 Journal</button>
             <button onclick="showSection('balance')">⚖️ Balance</button>
         </nav>
 
+        <!-- MOOD SECTION -->
         <section id="mood-section">
             <h2>How are you feeling right now?</h2>
             
@@ -74,14 +76,16 @@
             <div id="mood-history"></div>
         </section>
 
+        <!-- JOURNAL SECTION -->
         <section id="journal-section" style="display:none;">
             <h2>Reflections</h2>
             <textarea id="journal-input" placeholder="What’s on your mind today..."></textarea>
-            <button onclick="saveJournal()" style="width: 100%;">Save & Grow Plant 🌱</button>
+            <button onclick="saveJournal()" style="width: 100%; margin: 10px 0;">Save & Grow Plant 🌱</button>
             <button onclick="exportJournal()" class="secondary-btn">Export Journal (TXT)</button>
             <div id="past-entries"></div>
         </section>
 
+        <!-- BALANCE SECTION -->
         <section id="balance-section" style="display:none;">
             <h2>Work-Life Balance</h2>
             <div class="input-group">
@@ -89,9 +93,9 @@
                 <input type="number" id="social-hrs" placeholder="Social / Rest Hours">
                 <button onclick="updateChart()" style="width: 100%;">Update Chart</button>
             </div>
-            <canvas id="balanceChart" width="400" height="400"></canvas>
+            <canvas id="balanceChart"></canvas>
             
-            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+            <hr>
             <button id="focus-btn" onclick="toggleFocusMode()" style="width: 100%;">Deep Focus Mode</button>
         </section>
 
