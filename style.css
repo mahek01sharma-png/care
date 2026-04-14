@@ -20,159 +20,178 @@ body {
     background-color: var(--bg);
     color: var(--text);
     font-family: 'Segoe UI', system-ui, sans-serif;
-    transition: background-color 0.4s, color 0.4s;
-    line-height: 1.5;
     margin: 0;
+    padding: 0;
+    line-height: 1.5;
+    transition: background-color 0.4s;
 }
 
 .container {
     background: var(--cont);
-    width: 90%;
+    width: 94%;
     max-width: 420px;
-    margin: 20px auto;
-    padding: 25px;
+    margin: 15px auto;
+    padding: 20px;
     border-radius: 24px;
-    text-align: center;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    min-height: calc(100vh - 30px);
+    box-sizing: border-box;
 }
 
-/* Authentication Forms */
-input[type="text"], 
-input[type="password"], 
-input[type="number"],
-textarea {
+/* Typography & Inputs */
+h1, h2, h3 {
+    margin: 8px 0;
+}
+
+input[type="text"], input[type="password"], input[type="number"], textarea {
     width: 100%;
     padding: 14px;
     margin: 10px 0;
     border: 1px solid #ddd;
     border-radius: 12px;
-    font-size: 1em;
+    font-size: 1rem;
     box-sizing: border-box;
-    background: var(--cont);
-    color: var(--text);
 }
 
-#auth-error {
-    font-size: 0.9em;
-    margin-bottom: 10px;
+textarea {
+    height: 110px;
+    resize: vertical;
 }
 
 /* Buttons */
 button {
     background: var(--accent);
     border: none;
-    padding: 12px 16px;
+    padding: 13px 16px;
     border-radius: 12px;
     cursor: pointer;
-    margin: 6px 4px;
-    color: var(--text);
     font-weight: 600;
     transition: all 0.2s;
 }
 
 button:hover {
     transform: translateY(-2px);
-    filter: brightness(1.1);
+    filter: brightness(1.08);
 }
 
-/* Header & Theme */
+/* Header */
 .header-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
-#theme-toggle {
-    font-size: 0.8em;
-    padding: 8px 12px;
-}
-
-/* Garden Display */
+/* Garden */
 #garden-display {
     background: rgba(0, 0, 0, 0.04);
-    padding: 18px;
+    padding: 16px;
     border-radius: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
+    text-align: center;
 }
 
 #plant-box {
-    font-size: 2rem;
-    line-height: 1.6;
-    min-height: 60px;
-    word-wrap: break-word;
+    font-size: 1.9rem;
+    line-height: 1.5;
+    min-height: 55px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 5px;
+    gap: 6px;
 }
 
 /* Navigation */
 nav {
     display: flex;
-    justify-content: space-around;
-    margin-bottom: 25px;
+    gap: 6px;
+    margin: 20px 0;
     background: rgba(0,0,0,0.03);
-    padding: 10px;
-    border-radius: 15px;
+    padding: 8px;
+    border-radius: 16px;
 }
 
 nav button {
     flex: 1;
-    margin: 0 5px;
+    padding: 12px 8px;
+    font-size: 0.95rem;
 }
 
-/* Mood & Suggestions */
+/* Mood Grid - Better mobile fit */
 .mood-options {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(78px, 1fr));
     gap: 10px;
     margin: 20px 0;
 }
 
 .mood-options button {
-    padding: 15px 5px;
-    font-size: 1.2em;
+    padding: 14px 6px;
+    font-size: 1.35rem;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+/* Todo Area */
 #todo-area {
     margin-top: 20px;
     padding: 18px;
     border-radius: 16px;
     background: var(--cont);
-    text-align: left;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    text-align: left;
 }
 
-/* Journaling */
-textarea {
-    height: 120px;
-    resize: none;
+#todo-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
+#todo-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+/* Streak & History */
+#streak-counter {
+    background: #e8f5e8;
+    color: #2e7d32;
+    padding: 12px;
+    border-radius: 14px;
+    margin: 16px 0;
+    font-size: 1.1em;
+}
+
+#mood-history {
+    margin-top: 15px;
+    padding: 12px;
+    background: rgba(0,0,0,0.04);
+    border-radius: 12px;
+    font-size: 0.95em;
+}
+
+/* Journal */
 #past-entries {
-    max-height: 300px;
+    max-height: 320px;
     overflow-y: auto;
-    margin-top: 20px;
+    margin-top: 15px;
+    text-align: left;
 }
 
-/* Breathing Overlay Animation Refinements */
-#breathing-overlay h2 { color: white; }
-#phase-text { font-weight: 300; letter-spacing: 1px; }
-
-/* Focus Mode */
-.focus-active {
-    background-color: var(--soft-green) !important;
-    animation: pulse 2s infinite;
+/* Chart */
+canvas {
+    max-width: 100% !important;
+    height: auto !important;
+    margin: 15px auto;
+    border-radius: 12px;
 }
 
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.7; }
-    100% { opacity: 1; }
-}
-
-/* Utility */
+/* Misc */
 .secondary-btn {
     background: #e0e0e0;
     color: #555;
@@ -184,24 +203,38 @@ textarea {
     border: 2px solid var(--error);
     color: var(--error);
     width: 100%;
+    padding: 14px;
     margin-top: 25px;
+    font-weight: 600;
 }
 
-.logout-btn:hover {
-    background: var(--error);
-    color: white;
-}
-
-/* Dark Mode Overrides */
+/* Dark Mode */
 .dark-mode .container {
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 .dark-mode input, .dark-mode textarea {
     background: #2c3e50;
-    border-color: #444;
+    border-color: #555;
 }
 
 .dark-mode button {
     color: white;
+}
+
+/* Small screen improvements */
+@media (max-width: 360px) {
+    .mood-options {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+    
+    .mood-options button {
+        font-size: 1.2rem;
+        padding: 12px 4px;
+    }
+    
+    #plant-box {
+        font-size: 1.7rem;
+    }
 }
