@@ -1,40 +1,153 @@
+// 1. CONFIGURATION & GLOBAL VARIABLES
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTL8FSmuDcGE8hlGNOpEvTVQbGXBKpOCYv14ZG2Amnqy74QDR8NNWk3eoB6Doag9oZQTK5UjaGYBU-K/pub?output=csv';
 let currentUser = "Gardener";
 let myChart = null;
+let deferredPrompt;
+let focusInt;
 
-// PWA Registration
+// 2. PWA INSTALLATION & SERVICE WORKER LOGIC
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('ZenGarden Service Worker Registered'))
+            .catch(err => console.log('Service Worker failed', err));
+    });
 }
 
-// 1. Auth & Welcome
+// Capturing the Install Prompt
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    console.log("ZenGarden is ready to be installed.");
+    // Optional: Trigger a custom install button here if you add one to the UI
+});
+
+window.addEventListener('appinstalled', () => {
+    console.log('ZenGarden was installed successfully!');
+    deferredPrompt = null;
+});
+
+// 3. AUTHENTICATION (CSV BASED)
 async function handleLogin() {
-    const user = document.getElementById('username').value.trim();
-    const pass = document.getElementById('password').value.trim();
+    const userField = document.getElementById('username');
+    const passField = document.getElementById('password');
+    const user = userField.value.trim();
+    const pass = passField.value.trim();
+    
     try {
         const response = await fetch(CSV_URL);
         const data = await response.text();
-        const rows = data.split('\n').map(r => r.split(','));
-        if (rows.some(r => r[0].trim() === user && r[1].trim() === pass)) {
-            currentUser = user;
-            document.getElementById('welcome-msg').innerText = `Hi, ${user}!`;
+        const rows = data.split('\n').map(row => row.split(','));
+        
+        const isValid = rows.some(row => row[0].trim() === user && row[1].trim() === pass);
+        
+        if (isValid) {
+            currentUser = user; 
+            document.getElementById('welcome-msg').innerText = `Hi, ${currentUser}! 🌿`;
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'block';
+            
+            // Initialize App Components
             updateGardenUI();
             initChart();
-            if (Notification.permission !== "granted") Notification.requestPermission();
-        } else { document.getElementById('login-error').innerText = "Invalid Login"; }
-    } catch (e) { console.error(e); }
+            loadEntries();
+            
+            // Request Notification Permission for Focus Mode
+            if (Notification.permission !== "granted") {
+                Notification.requestPermission();
+            }
+        } else {
+            document.getElementById('login-error').innerText = "Invalid credentials.";
+        }
+    } catch (e) {
+        console.error("Auth failed", e);
+        document.getElementById('login-error').innerText = "Error connecting to database.";
+    }
 }
 
-// 2. Data Viz: Work-Life Balance
+// 4. NAVIGATION
+function showSection(id) {
+    ['mood', 'journal', 'balance'].forEach(s => {
+        document.getElementById(s + '-section').style.display = (s === id) ? 'block' : 'none';
+    });
+}
+
+// 5. MOOD TRACKING & SUGGESTIONS
+function setMood(mood) {
+    growPlant();
+    const todoArea = document.getElementById('todo-area');
+    const todoList = document.getElementById('todo-list');
+    todoList.innerHTML = "";
+    todoArea.style.display = 'block';
+
+    let suggestions = [];
+    if (mood === 'Stressed') {
+        suggestions = ['5 min deep breathing', 'Listen to nature sounds', 'Stretch your neck'];
+    } else if (mood === 'Happy') {
+        suggestions = ['Message a friend', 'Take a 10-min walk', 'Write one win'];
+    } else if (mood === 'Calm') {
+        suggestions = ['Read a book chapter', 'Water your plants', '2 mins of silence'];
+    }
+
+    suggestions.forEach(task => {
+        const li = document.createElement('li');
+        li.innerText = task;
+        todoList.appendChild(li);
+    });
+}
+
+// 6. JOURNALING & EXPORT
+function saveJournal() {
+    const text = document.getElementById('journal-input').value;
+    if (!text) return;
+    
+    const entries = JSON.parse(localStorage.getItem('journals') || '[]');
+    entries.unshift({ date: new Date().toLocaleString(), content: text });
+    localStorage.setItem('journals', JSON.stringify(entries));
+    document.getElementById('journal-input').value = "";
+    
+    growPlant();
+    loadEntries();
+}
+
+function loadEntries() {
+    const display = document.getElementById('past-entries');
+    const entries = JSON.parse(localStorage.getItem('journals') || '[]');
+    display.innerHTML = entries.map(e => `
+        <div style="border-bottom:1px solid #eee; margin-top:10px; padding-bottom:5px;">
+            <small>${e.date}</small><p>${e.content}</p>
+        </div>`).join('');
+}
+
+function exportJournal() {
+    const entries = JSON.parse(localStorage.getItem('journals') || '[]');
+    let content = `ZenGarden Reflection Logs for ${currentUser}\n\n`;
+    entries.forEach(e => content += `[${e.date}]: ${e.content}\n`);
+    
+    const blob = new Blob([content], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'ZenGarden_Journal.txt';
+    a.click();
+}
+
+// 7. DATA VISUALIZATION (CHART.JS)
 function initChart() {
     const ctx = document.getElementById('balanceChart').getContext('2d');
     myChart = new Chart(ctx, {
         type: 'doughnut',
-        data: { labels: ['Work', 'Social'], datasets: [{ data: [0, 0], backgroundColor: ['#ff9999', '#99ff99'] }] }
+        data: {
+            labels: ['Work Hours', 'Social/Rest Hours'],
+            datasets: [{
+                data: [0, 0],
+                backgroundColor: ['#ff9999', '#99ff99'],
+                borderWidth: 1
+            }]
+        },
+        options: { responsive: true }
     });
 }
+
 function updateChart() {
     const w = document.getElementById('work-hrs').value || 0;
     const s = document.getElementById('social-hrs').value || 0;
@@ -42,69 +155,47 @@ function updateChart() {
     myChart.update();
 }
 
-// 3. Gamification: Garden Growth
-function growPlant() {
-    let plants = JSON.parse(localStorage.getItem('garden') || '[]');
-    plants.push('🌱');
-    localStorage.setItem('garden', JSON.stringify(plants));
-    updateGardenUI();
-}
-function updateGardenUI() {
-    const box = document.getElementById('plant-box');
-    const plants = JSON.parse(localStorage.getItem('garden') || '[]');
-    box.innerText = plants.join(' ');
-}
-
-// 4. Notifications & Focus
-let focusInt;
+// 8. FOCUS MODE & NOTIFICATIONS
 function toggleFocusMode() {
     const btn = document.getElementById('focus-btn');
     if (btn.innerText.includes("Active")) {
         clearInterval(focusInt);
-        btn.innerText = "Deep Focus Mode";
+        btn.innerText = "Enable Deep Focus Mode";
+        btn.classList.remove('focus-active');
     } else {
-        btn.innerText = "Focus Active (Notifying...)";
+        btn.innerText = "Focus Mode Active";
+        btn.classList.add('focus-active');
+        
+        // Push initial notification
+        if (Notification.permission === "granted") {
+            new Notification("ZenGarden", { body: "Deep Focus Mode started! 🌿", icon: "https://via.placeholder.com/192" });
+        }
+
         focusInt = setInterval(() => {
-            new Notification("ZenGarden Reminder", { body: "Time to blink and look away from the screen! 🌿", icon: "https://via.placeholder.com/192" });
-        }, 300000); // 5 mins
+            if (Notification.permission === "granted") {
+                new Notification("Time to stretch!", { body: "Blink, drink water, and check your posture. 💧", icon: "https://via.placeholder.com/192" });
+            }
+        }, 1200000); // 20 minutes
     }
 }
 
-// 5. Dark Mode / Sunset Toggle
+// 9. GAMIFICATION & THEME
+function growPlant() {
+    let garden = JSON.parse(localStorage.getItem('garden') || '[]');
+    garden.push('🌱');
+    localStorage.setItem('garden', JSON.stringify(garden));
+    updateGardenUI();
+}
+
+function updateGardenUI() {
+    const box = document.getElementById('plant-box');
+    const garden = JSON.parse(localStorage.getItem('garden') || '[]');
+    box.innerText = garden.join(' ');
+}
+
 function toggleTheme() {
     const body = document.body;
     body.classList.toggle('dark-mode');
-    document.getElementById('theme-toggle').innerText = body.classList.contains('dark-mode') ? "☀️ Day Mode" : "🌙 Sunset Mode";
-}
-
-// 6. Export Journal (Accountability)
-function exportJournal() {
-    const entries = JSON.parse(localStorage.getItem('journals') || '[]');
-    let content = "My ZenGarden Journal\n\n";
-    entries.forEach(e => content += `${e.date}: ${e.content}\n`);
-    const blob = new Blob([content], { type: 'text/plain' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'MyJournal.txt';
-    a.click();
-}
-
-// Keep existing showSection, setMood, saveJournal functions...
-function showSection(id) {
-    ['mood', 'journal', 'balance'].forEach(s => document.getElementById(s + '-section').style.display = (s === id) ? 'block' : 'none');
-}
-function setMood(m) {
-    growPlant();
-    document.getElementById('todo-area').style.display = 'block';
-    const list = document.getElementById('todo-list');
-    list.innerHTML = m === 'Stressed' ? "<li>5m Breathing</li><li>Herbal Tea</li>" : "<li>Keep it up!</li>";
-}
-function saveJournal() {
-    const val = document.getElementById('journal-input').value;
-    if(!val) return;
-    const entries = JSON.parse(localStorage.getItem('journals') || '[]');
-    entries.unshift({ date: new Date().toLocaleDateString(), content: val });
-    localStorage.setItem('journals', JSON.stringify(entries));
-    document.getElementById('journal-input').value = "";
-    growPlant();
+    const isDark = body.classList.contains('dark-mode');
+    document.getElementById('theme-toggle').innerText = isDark ? "☀️ Day Mode" : "🌙 Sunset Mode";
 }
