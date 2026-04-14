@@ -2,7 +2,7 @@
   "name": "ZenGarden Self-Care",
   "short_name": "ZenGarden",
   "description": "A student wellness and productivity PWA designed for IT Project Management.",
-  "start_url": "index.html",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#f5f0e1",
   "theme_color": "#d4e9d4",
