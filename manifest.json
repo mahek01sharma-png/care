@@ -2,7 +2,7 @@
     "name": "ZenGarden",
     "short_name": "ZenGarden",
     "description": "Your personal self-care garden 🌿",
-    "start_url": "/index.html",
+    "start_url": "care/index.html",
     "display": "standalone",
     "background_color": "#f5f0e1",
     "theme_color": "#d4e9d4",
