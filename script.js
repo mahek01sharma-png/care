@@ -3,23 +3,15 @@ let currentUser = "Gardener";
 let myChart = null;
 let focusInt;
 
-// PWA Registration
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
-}
-
-// 1. AUTHENTICATION & REGISTRATION LOGIC
+// 1. AUTHENTICATION & REGISTRATION
 function toggleAuth(showRegister) {
     document.getElementById('login-form').style.display = showRegister ? 'none' : 'block';
     document.getElementById('register-form').style.display = showRegister ? 'block' : 'none';
-    document.getElementById('auth-error').innerText = "";
 }
 
 async function handleLogin() {
     const user = document.getElementById('username').value.trim();
     const pass = document.getElementById('password').value.trim();
-    
-    // First, check Local Storage (New Registrations)
     const localUsers = JSON.parse(localStorage.getItem('zen_users') || '[]');
     const localMatch = localUsers.find(u => u.username === user && u.password === pass);
 
@@ -28,7 +20,6 @@ async function handleLogin() {
         return;
     }
 
-    // Second, check Google CSV
     try {
         const response = await fetch(CSV_URL);
         const data = await response.text();
@@ -39,28 +30,19 @@ async function handleLogin() {
             document.getElementById('auth-error').innerText = "Invalid credentials.";
         }
     } catch (e) {
-        document.getElementById('auth-error').innerText = "Database connection error.";
+        document.getElementById('auth-error').innerText = "Database error.";
     }
 }
 
 function handleRegister() {
     const user = document.getElementById('reg-username').value.trim();
     const pass = document.getElementById('reg-password').value.trim();
-
-    if (user.length < 3 || pass.length < 3) {
-        document.getElementById('auth-error').innerText = "Username/Password too short.";
-        return;
-    }
+    if (user.length < 3) return alert("Username too short");
 
     let localUsers = JSON.parse(localStorage.getItem('zen_users') || '[]');
-    if (localUsers.some(u => u.username === user)) {
-        document.getElementById('auth-error').innerText = "Username already exists.";
-        return;
-    }
-
     localUsers.push({ username: user, password: pass });
     localStorage.setItem('zen_users', JSON.stringify(localUsers));
-    alert("Account created! You can now log in.");
+    alert("Account created!");
     toggleAuth(false);
 }
 
@@ -69,24 +51,95 @@ function startApp(user) {
     document.getElementById('welcome-msg').innerText = `Hi, ${user}! 🌿`;
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-screen').style.display = 'block';
-    
     updateGardenUI();
     initChart();
     loadEntries();
     if (Notification.permission !== "granted") Notification.requestPermission();
 }
 
-// 2. DATA VIZ (CHART.JS)
+// 2. MOOD LOGIC (EXPANDED)
+function setMood(mood) {
+    const area = document.getElementById('todo-area');
+    const list = document.getElementById('todo-list');
+    const moodTitle = area.querySelector('h3');
+    
+    area.style.display = 'block';
+    list.innerHTML = "";
+    
+    // Grow a plant for interacting with your wellness
+    growPlant();
+
+    let suggestions = [];
+
+    if (mood === 'Stressed') {
+        moodTitle.innerText = "De-stressing Protocol:";
+        suggestions = [
+            'Try the 4-7-8 breathing technique',
+            'Step away from the screen for 5 minutes',
+            'Drink a glass of water',
+            'Write one thing you can control right now'
+        ];
+        // Visual feedback: Subtle red glow to acknowledge stress
+        area.style.borderLeft = "5px solid #ff9999";
+    } else if (mood === 'Happy') {
+        moodTitle.innerText = "Spread the Joy:";
+        suggestions = [
+            'Message a friend or family member',
+            'Put on your favorite upbeat song',
+            'Plan a small reward for later today',
+            'Take a photo of something beautiful'
+        ];
+        area.style.borderLeft = "5px solid #99ff99";
+    } else if (mood === 'Calm') {
+        moodTitle.innerText = "Mindful Maintenance:";
+        suggestions = [
+            'Practice 2 minutes of seated meditation',
+            'Light a candle or use an essential oil',
+            'List three things you are grateful for',
+            'Do some light neck and shoulder stretches'
+        ];
+        area.style.borderLeft = "5px solid #d4e9d4";
+    }
+
+    suggestions.forEach(task => {
+        const li = document.createElement('li');
+        li.innerText = task;
+        li.style.padding = "5px 0";
+        list.appendChild(li);
+    });
+}
+
+// 3. GARDEN GAMIFICATION
+function growPlant() {
+    let garden = JSON.parse(localStorage.getItem('garden') || '[]');
+    // Cycle through different plant emojis
+    const plantTypes = ['🌱', '🌿', '🍀', '🍃', '🌸', '🌼'];
+    const randomPlant = plantTypes[Math.floor(Math.random() * plantTypes.length)];
+    
+    garden.push(randomPlant);
+    localStorage.setItem('garden', JSON.stringify(garden));
+    updateGardenUI();
+}
+
+function updateGardenUI() {
+    const box = document.getElementById('plant-box');
+    const garden = JSON.parse(localStorage.getItem('garden') || '[]');
+    box.innerText = garden.join(' ');
+}
+
+// 4. CHART & REMAINING LOGIC
 function initChart() {
     const ctx = document.getElementById('balanceChart').getContext('2d');
+    if (myChart) myChart.destroy();
     myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: ['Work', 'Social/Rest'],
-            datasets: [{ data: [0, 0], backgroundColor: ['#ff9999', '#99ff99'] }]
+            datasets: [{ data: [1, 1], backgroundColor: ['#ff9999', '#99ff99'] }]
         }
     });
 }
+
 function updateChart() {
     const w = document.getElementById('work-hrs').value || 0;
     const s = document.getElementById('social-hrs').value || 0;
@@ -94,27 +147,12 @@ function updateChart() {
     myChart.update();
 }
 
-// 3. MOOD & GARDEN
-function setMood(m) {
-    growPlant();
-    const area = document.getElementById('todo-area');
-    const list = document.getElementById('todo-list');
-    area.style.display = 'block';
-    list.innerHTML = m === 'Stressed' ? "<li>5m Breathing</li><li>Drink Water</li>" : "<li>Keep it up!</li>";
+function showSection(id) {
+    ['mood', 'journal', 'balance'].forEach(s => {
+        document.getElementById(s + '-section').style.display = (s === id) ? 'block' : 'none';
+    });
 }
 
-function growPlant() {
-    let garden = JSON.parse(localStorage.getItem('garden') || '[]');
-    garden.push('🌱');
-    localStorage.setItem('garden', JSON.stringify(garden));
-    updateGardenUI();
-}
-
-function updateGardenUI() {
-    document.getElementById('plant-box').innerText = JSON.parse(localStorage.getItem('garden') || '[]').join(' ');
-}
-
-// 4. JOURNALING
 function saveJournal() {
     const val = document.getElementById('journal-input').value;
     if(!val) return;
@@ -128,7 +166,10 @@ function saveJournal() {
 
 function loadEntries() {
     const entries = JSON.parse(localStorage.getItem('journals') || '[]');
-    document.getElementById('past-entries').innerHTML = entries.map(e => `<div><small>${e.date}</small><p>${e.content}</p></div>`).join('');
+    document.getElementById('past-entries').innerHTML = entries.map(e => `
+        <div style="border-bottom:1px solid #eee; margin-top:10px;">
+            <small>${e.date}</small><p>${e.content}</p>
+        </div>`).join('');
 }
 
 function exportJournal() {
@@ -138,11 +179,10 @@ function exportJournal() {
     const blob = new Blob([content], { type: 'text/plain' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'Journal.txt';
+    a.download = 'MyJournal.txt';
     a.click();
 }
 
-// 5. FOCUS & THEME
 function toggleFocusMode() {
     const btn = document.getElementById('focus-btn');
     if (btn.innerText.includes("Active")) {
@@ -151,7 +191,7 @@ function toggleFocusMode() {
     } else {
         btn.innerText = "Focus Active";
         focusInt = setInterval(() => {
-            if (Notification.permission === "granted") new Notification("Blink & Hydrate! 🌿");
+            if (Notification.permission === "granted") new Notification("ZenGarden: Check your posture! 🌿");
         }, 1200000);
     }
 }
