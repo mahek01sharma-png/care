@@ -6,11 +6,11 @@
     <title>ZenGarden Self-Care</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="light-mode">
     <div id="login-screen" class="container">
-        <h1>Welcome to ZenGarden</h1>
-        <p>Please log in to continue</p>
+        <h1>ZenGarden</h1>
         <input type="text" id="username" placeholder="Username">
         <input type="password" id="password" placeholder="Password">
         <button onclick="handleLogin()">Enter Garden</button>
@@ -18,7 +18,15 @@
     </div>
 
     <div id="app-screen" class="container" style="display: none;">
-        <h2 id="welcome-msg">Welcome Back!</h2>
+        <div class="header-actions">
+            <button id="theme-toggle" onclick="toggleTheme()">🌙 Sunset Mode</button>
+            <h2 id="welcome-msg">Hi, Gardener!</h2>
+        </div>
+
+        <div id="garden-display">
+            <p>Your Garden Growth:</p>
+            <div id="plant-box"></div>
+        </div>
         
         <nav>
             <button onclick="showSection('mood')">Mood</button>
@@ -33,33 +41,34 @@
                 <button onclick="setMood('Stressed')">😫 Stressed</button>
                 <button onclick="setMood('Calm')">🌿 Calm</button>
             </div>
-            <div id="todo-area" style="display:none; margin-top: 20px; text-align: left; background: #f9f9f9; padding: 10px; border-radius: 10px;">
-                <h3 style="font-size: 1rem;">Suggestions:</h3>
+            <div id="todo-area" style="display:none;">
+                <h3>Suggestions:</h3>
                 <ul id="todo-list"></ul>
             </div>
         </section>
 
         <section id="journal-section" style="display:none;">
-            <h2>Daily Reflections</h2>
-            <textarea id="journal-input" placeholder="Write your thoughts here..."></textarea>
-            <button onclick="saveJournal()">Save Entry</button>
+            <h2>Reflections</h2>
+            <textarea id="journal-input" placeholder="Write thoughts..."></textarea>
+            <button onclick="saveJournal()">Save & Grow</button>
+            <button onclick="exportJournal()" class="secondary-btn">Export My Week (TXT)</button>
             <div id="past-entries"></div>
         </section>
 
         <section id="balance-section" style="display:none;">
             <h2>Work-Life Balance</h2>
             <div class="input-group">
-                <label>Work Hours:</label> <input type="number" id="work-hrs">
-                <label>Social Hours:</label> <input type="number" id="social-hrs">
-                <button onclick="updateChart()">Update</button>
+                <input type="number" id="work-hrs" placeholder="Work Hours">
+                <input type="number" id="social-hrs" placeholder="Social Hours">
+                <button onclick="updateChart()">Update Chart</button>
             </div>
+            <canvas id="balanceChart" width="400" height="400"></canvas>
             <hr>
-            <button id="focus-btn" onclick="toggleFocusMode()">Enable Deep Focus Mode</button>
+            <button id="focus-btn" onclick="toggleFocusMode()">Deep Focus Mode</button>
         </section>
-        
-        <button onclick="location.reload()" style="margin-top:20px; background:#eee; font-size: 0.8rem;">Logout</button>
-    </div>
 
+        <button onclick="location.reload()" class="logout-btn">Logout</button>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
