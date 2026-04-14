@@ -2,7 +2,7 @@
   "name": "Zen Garden",
   "short_name": "Zen",
   "description": "A self care app",
-  "start_url": "./index.html",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ff4500",
