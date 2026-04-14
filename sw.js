@@ -1,49 +1,50 @@
-const CACHE_NAME = 'zengarden-v3'; // Incremented version
-const ASSETS = [
-    './',
-    './index.html',
-    './style.css',
-    './script.js',
-    './manifest.json',
-    './icon-192.png',
-    './icon-512.png',
-    'https://cdn.jsdelivr.net/npm/chart.js'
+const CACHE_NAME = 'zen-garden-cache-v1';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/sketch.js',
+  '/style.css',
+  '/p5.js',
+  '/p5.sound.min.js',
+  '/song.mp3',
+  '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
-// Install Service Worker
 self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            console.log('ZenGarden: Caching all assets');
-            // Using return here ensures the installation waits until caching is done
-            return cache.addAll(ASSETS);
-        })
-    );
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        return cache.addAll(urlsToCache);
+      })
+  );
 });
 
-// Activate and remove old caches
-self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((keys) => {
-            return Promise.all(keys
-                .filter(key => key !== CACHE_NAME)
-                .map(key => caches.delete(key))
-            );
-        })
-    );
-});
-
-// Fetch events for offline support
 self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request).then((cachedResponse) => {
-            // Return the cached version if it exists, otherwise fetch from network
-            return cachedResponse || fetch(event.request);
-        }).catch(() => {
-            // Fallback if both fail (e.g., user is offline and asset isn't cached)
-            if (event.request.mode === 'navigate') {
-                return caches.match('./index.html');
-            }
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => {
+        // Cache hit - return response
+        if (response) {
+          return response;
+        }
+        return fetch(event.request);
+      })
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
         })
-    );
+      );
+    })
+  );
 });
