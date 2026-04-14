@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zen-garden-cache-v1';
+const CACHE_NAME = 'zen-cache-v1';
 const urlsToCache = [
   '/',
   '/index.html',
