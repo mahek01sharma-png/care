@@ -1,13 +1,13 @@
 const CACHE_NAME = 'zengarden-cache-v3';
 
 const urlsToCache = [
-    '/care/',
-    '/care/index.html',
-    '/care/script.js',
-    '/care/style.css',
-    '/care/manifest.json',
-    '/care/icon-192.png',
-    '/care/icon-512.png'
+    '/',
+    '/index.html',
+    '/script.js',
+    '/style.css',
+    '/manifest.json',
+    '/icon-192.png',
+    '/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
