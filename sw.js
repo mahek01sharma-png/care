@@ -1,49 +1,56 @@
-const CACHE_NAME = 'zen-cache-v2';
+const CACHE_NAME = 'zengarden-cache-v2';
 const urlsToCache = [
-  './',
-  './index.html',
-  './script.js',
-  './style.css',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
+    '/',
+    '/index.html',
+    '/script.js',
+    '/style.css',
+    '/manifest.json'
+    // Add icons if you have them:
+    '/icon-192.png',
+    '/icon-512.png'
 ];
 
-// Add p5 files only if you are actually using them in this project version
-// './p5.js',
-// './p5.sound.min.js',
-
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-  );
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then((cache) => {
+                console.log('ZenGarden: Caching app files');
+                return cache.addAll(urlsToCache);
+            })
+    );
 });
 
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version, or fetch from network
-        return response || fetch(event.request);
-      })
-  );
+    event.respondWith(
+        caches.match(event.request)
+            .then((response) => {
+                // Return cached version if available
+                if (response) {
+                    return response;
+                }
+                // Otherwise fetch from network
+                return fetch(event.request);
+            })
+            .catch(() => {
+                // Optional: Return a fallback page if offline
+                if (event.request.mode === 'navigate') {
+                    return caches.match('/index.html');
+                }
+            })
+    );
 });
 
 self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME];
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (!cacheWhitelist.includes(cacheName)) {
-            return caches.delete(cacheName);
-          }
+    const cacheWhitelist = [CACHE_NAME];
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    if (cacheWhitelist.indexOf(cacheName) === -1) {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
         })
-      );
-    })
-  );
+    );
 });
