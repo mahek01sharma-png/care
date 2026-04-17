@@ -1,4 +1,5 @@
 :root {
+    /* Default - Light Zen */
     --bg: #f5f0e1;
     --cont: #ffffff;
     --text: #4a5d4a;
@@ -8,23 +9,27 @@
     --error: #d66;
 }
 
-.dark-mode {
-    --bg: #2c3e50;
-    --cont: #34495e;
-    --text: #ecf0f1;
-    --accent: #16a085;
-    --soft-green: #1abc9c;
-}
+/* 12 VIBRANT THEMES */
+body[data-theme='dark']     { --bg: #1e293b; --cont: #334155; --text: #f1f5f9; --accent: #4ade80; }
+body[data-theme='sakura']   { --bg: #fff1f2; --cont: #ffffff; --text: #9f1239; --accent: #fda4af; }
+body[data-theme='forest']   { --bg: #14532d; --cont: #166534; --text: #f0fdf4; --accent: #4ade80; }
+body[data-theme='ocean']    { --bg: #0c4a6e; --cont: #075985; --text: #f0f9ff; --accent: #38bdf8; }
+body[data-theme='sunset']   { --bg: #450a0a; --cont: #7f1d1d; --text: #fef2f2; --accent: #f87171; }
+body[data-theme='lavender'] { --bg: #2e1065; --cont: #4c1d95; --text: #f5f3ff; --accent: #a78bfa; }
+body[data-theme='citrus']   { --bg: #78350f; --cont: #92400e; --text: #fffbeb; --accent: #fbbf24; }
+body[data-theme='nebula']   { --bg: #020617; --cont: #1e1b4b; --text: #e0e7ff; --accent: #818cf8; }
+body[data-theme='mint']     { --bg: #064e3b; --cont: #065f46; --text: #ecfdf5; --accent: #34d399; }
+body[data-theme='ruby']     { --bg: #4c0519; --cont: #831843; --text: #fff1f2; --accent: #fb7185; }
+body[data-theme='gold']     { --bg: #422006; --cont: #713f12; --text: #fefce8; --accent: #facc15; }
+body[data-theme='light']    { --bg: #f5f0e1; --cont: #ffffff; --text: #4a5d4a; --accent: #d4e9d4; }
 
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     background-color: var(--bg);
     color: var(--text);
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    transition: background-color 0.4s, color 0.4s;
+    transition: all 0.4s ease;
     line-height: 1.4;
     margin: 0;
     padding: 10px;
@@ -40,19 +45,19 @@ body {
     padding: 20px;
     border-radius: 24px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     overflow-x: hidden;
+    transition: background 0.4s;
 }
 
 input, textarea {
     width: 100%;
     padding: 12px;
     margin: 8px 0;
-    border: 1px solid #ddd;
+    border: 1px solid rgba(0,0,0,0.1);
     border-radius: 12px;
     background: var(--cont);
     color: var(--text);
-    font-size: 16px; /* Prevents iOS zoom on focus */
 }
 
 button {
@@ -62,108 +67,31 @@ button {
     border-radius: 12px;
     cursor: pointer;
     margin: 4px;
-    color: var(--text);
+    color: #1e293b; /* Dark text on buttons for contrast */
     font-weight: 600;
-    transition: all 0.2s;
-}
-
-button:active {
-    transform: scale(0.95);
-}
-
-.full-width {
-    width: 100%;
-    margin: 10px 0;
-}
-
-.header-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-}
-
-#welcome-msg { font-size: 1.1rem; }
-
-#garden-display {
-    background: rgba(0, 0, 0, 0.04);
-    padding: 15px;
-    border-radius: 20px;
-    margin: 15px 0;
-}
-
-#plant-box {
-    font-size: 1.8rem;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 5px;
-}
-
-nav {
-    display: flex;
-    gap: 5px;
-    margin-bottom: 20px;
-}
-
-nav button {
-    flex: 1;
-    font-size: 0.85rem;
-    padding: 12px 5px;
-}
-
-.mood-options {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin: 15px 0;
 }
 
 .mood-options button {
-    font-size: 11px;
-    padding: 10px 0;
-    margin: 0;
+    background: var(--accent);
+    color: var(--text);
+    filter: brightness(0.95);
 }
 
-#todo-area {
-    text-align: left;
-    background: rgba(0,0,0,0.02);
-    padding: 10px;
-    border-radius: 12px;
-    border-left: 4px solid var(--soft-green);
+nav button { background: var(--accent); }
+
+#garden-display {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 20px;
+    margin: 15px 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.chart-container {
-    position: relative;
-    margin: auto;
-    height: 250px;
-    width: 100%;
-}
-
-.secondary-btn {
-    background: #eee;
-    color: #666;
-    width: 100%;
-}
+#plant-box { font-size: 1.8rem; }
 
 .logout-btn {
     background: none;
     border: 1px solid var(--error);
     color: var(--error);
     width: 100%;
-    margin-top: 20px;
-}
-
-/* Scrollable Areas */
-#past-entries, #mood-history {
-    max-height: 150px;
-    overflow-y: auto;
-    margin-top: 15px;
-    font-size: 0.9rem;
-    text-align: left;
-}
-
-@media (max-width: 360px) {
-    .container { padding: 15px; }
-    #welcome-msg { font-size: 0.9rem; }
 }
