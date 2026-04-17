@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="light-mode">
+<body data-theme="light">
     <div id="login-screen" class="container">
         <h1>🌱 ZenGarden</h1>
         
@@ -32,7 +32,8 @@
 
     <div id="app-screen" class="container" style="display: none;">
         <div class="header-actions">
-            <button id="theme-toggle" onclick="toggleTheme()">🌙 Sunset Mode</button>
+            <select id="theme-menu" onchange="setTheme(this.value)" style="padding: 5px; border-radius: 8px; border: 1px solid var(--soft-green); background: var(--cont); color: var(--text);">
+                </select>
             <h2 id="welcome-msg">Hi, Gardener! 🌿</h2>
         </div>
 
@@ -53,7 +54,7 @@
                 <button onclick="setMood('happy')">happy<br>😊</button>
                 <button onclick="setMood('calm')">calm<br>😌</button>
                 <button onclick="setMood('energized')">energised<br>⚡</button>
-                <button onclick="setMood('stressed')">😟stressed<br></button>
+                <button onclick="setMood('stressed')">😟stressed</button>
                 <button onclick="setMood('anxious')">anxious<br>😰</button>
                 <button onclick="setMood('sad')">sad<br>😢</button>
                 <button onclick="setMood('tired')">tired<br>🥱</button>
