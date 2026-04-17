@@ -404,6 +404,35 @@ function toggleFocusMode() {
     }
 }
 
-function toggleTheme() {
-    document.body.classList.toggle('dark-mode');
+// ======================
+// THEME MANAGEMENT
+// ======================
+const THEMES = [
+    { id: 'light', name: 'Light Zen', color: '#f8fafc' },
+    { id: 'dark', name: 'Midnight', color: '#1e293b' },
+    { id: 'sakura', name: 'Sakura Pink', color: '#ffb7c5' },
+    { id: 'forest', name: 'Deep Forest', color: '#2d5a27' },
+    { id: 'ocean', name: 'Ocean Tide', color: '#0077be' },
+    { id: 'sunset', name: 'Vibrant Sunset', color: '#ff4e50' },
+    { id: 'lavender', name: 'Lavender Mist', color: '#967bb6' },
+    { id: 'citrus', name: 'Citrus Punch', color: '#ffb347' },
+    { id: 'nebula', name: 'Cosmic Nebula', color: '#4831d4' },
+    { id: 'mint', name: 'Fresh Mint', color: '#3eb489' },
+    { id: 'ruby', name: 'Ruby Glow', color: '#e0115f' },
+    { id: 'gold', name: 'Golden Hour', color: '#daa520' }
+];
+
+function setTheme(themeId) {
+    // Remove previous theme class or set attribute
+    document.body.setAttribute('data-theme', themeId);
+    
+    // Optional: Update UI or save to storage
+    localStorage.setItem('zen_theme', themeId);
+    console.log(`Theme changed to: ${themeId}`);
+}
+
+// Call this inside startApp() to load the user's saved theme
+function loadSavedTheme() {
+    const saved = localStorage.getItem('zen_theme') || 'light';
+    setTheme(saved);
 }
